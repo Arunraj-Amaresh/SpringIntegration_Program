@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+						http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd">
+
+	<bean id="inputDirectory" class="java.io.File">
+		<constructor-arg
+			value="C:/Users/BSIT-021/Documents/workspace-spring-tool-suite-4-4.23.1.RELEASE/Integration/src/main/resources" />
+	</bean>
+
+	<bean id="outputDirectory" class="java.io.File">
+		<constructor-arg
+			value="C:/Users/BSIT-021/Documents/workspace-spring-tool-suite-4-4.23.1.RELEASE/Integration/src/main/java" />
+	</bean>
+
+	<int-file:inbound-channel-adapter id="fileInboundAdapter"
+		directory="file:C:/Users/BSIT-021/Documents/workspace-spring-tool-suite-4-4.23.1.RELEASE/Integration/src/main/resources"
+		filename-pattern="*.csv" 
+		channel="fileInputChannel"
+		
+		>
+		<int:poller fixed-rate="10000" />
+	</int-file:inbound-channel-adapter>
+
+	<int:channel id="fileInputChannel" />
+
+	<int:service-activator input-channel="fileInputChannel" ref="fileProcessor"
+		method="processFile" output-channel="fileOutputChannel" />
+
+	<bean id="fileProcessor" class="com.example.Integration.FileProcessor" />
+
+	<int:channel id="fileOutputChannel" />
+
+	<int-file:outbound-channel-adapter id="fileOutboundAdapter"
+		directory="file:C:/Users/BSIT-021/Documents/workspace-spring-tool-suite-4-4.23.1.RELEASE/Integration/src/main/java"
+		channel="fileOutputChannel" 
+		 />
+		 
+		 
+		 
+		  <int:channel id="moveInput" />
+
+    <int-file:outbound-gateway id="mover"
+                               request-channel="moveInput"
+                               directory="file:C:/Users/BSIT-021/Documents/workspace-spring-tool-suite-4-4.23.1.RELEASE/Integration/src/main/resources"
+                               mode="REPLACE"
+                               delete-source-files="true" />
+	
+  
+
+</beans>
